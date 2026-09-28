@@ -5,17 +5,17 @@ tasty_bytes:
       type: snowflake
       account: 'not needed'
       user: 'not needed'
-      role: accountadmin
-      database: tasty_bytes_dbt_db
+      role: DBT_DEV_ROLE
+      database: tasty_bytes_dbt_db_16
       schema: dev
-      warehouse: tasty_bytes_dbt_wh
+      warehouse: DBT_DEV_WH
       threads: 8
     prod:
       type: snowflake
       account: 'not needed'
       user: 'not needed'
-      role: accountadmin
-      database: tasty_bytes_dbt_db
+      role: DBT_DEV_ROLE
+      database: tasty_bytes_dbt_db_16
       schema: prod
-      warehouse: tasty_bytes_dbt_wh
+      warehouse: DBT_DEV_WH
       threads: 8

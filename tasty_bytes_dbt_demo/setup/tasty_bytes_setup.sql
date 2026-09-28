@@ -18,7 +18,7 @@
 --   CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION ...
 -- =============================================================================
 
-USE ROLE ACCOUNTADMIN;
+USE ROLE DBT_DEV_ROLE;
 
 -- =============================================================================
 -- STEP 1: Create a warehouse for executing workspace actions
@@ -31,7 +31,7 @@ USE ROLE ACCOUNTADMIN;
 -- Alternatively, you can use an existing warehouse in your account.
 -- =============================================================================
 
-CREATE WAREHOUSE tasty_bytes_dbt_wh WAREHOUSE_SIZE = XLARGE AUTO_SUSPEND = 60;
+--CREATE WAREHOUSE tasty_bytes_dbt_wh WAREHOUSE_SIZE = XLARGE AUTO_SUSPEND = 60;
 
 -- =============================================================================
 -- STEP 2: Create a database and schemas for integrations and model materializations
@@ -40,13 +40,13 @@ CREATE WAREHOUSE tasty_bytes_dbt_wh WAREHOUSE_SIZE = XLARGE AUTO_SUSPEND = 60;
 -- The RAW schema holds the Tasty Bytes foundational source data.
 -- =============================================================================
 
-CREATE DATABASE IF NOT EXISTS tasty_bytes_dbt_db;
-CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.dev;
-CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.prod;
+--CREATE DATABASE IF NOT EXISTS tasty_bytes_dbt_db;
+--CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.dev;
+--CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.prod;
 -- Used for storing objects Snowflake needs for GitHub integration (secrets, etc.)
-CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.integrations;
+--CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.integrations;
 -- Used for the Tasty Bytes foundational source data loaded from S3
-CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.raw;
+--CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.raw;
 
 -- =============================================================================
 -- STEP 3: Enable logging, tracing, and metrics
@@ -56,13 +56,13 @@ CREATE SCHEMA IF NOT EXISTS tasty_bytes_dbt_db.raw;
 -- See: https://docs.snowflake.com/en/user-guide/data-engineering/dbt-projects-on-snowflake-monitoring-observability
 -- =============================================================================
 
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET LOG_LEVEL = 'INFO';
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET TRACE_LEVEL = 'ALWAYS';
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET METRIC_LEVEL = 'ALL';
+--ALTER SCHEMA tasty_bytes_dbt_db_16.dev SET LOG_LEVEL = 'INFO';
+--ALTER SCHEMA tasty_bytes_dbt_db_16.dev SET TRACE_LEVEL = 'ALWAYS';
+--ALTER SCHEMA tasty_bytes_dbt_db_16.dev SET METRIC_LEVEL = 'ALL';
 
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET LOG_LEVEL = 'INFO';
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET TRACE_LEVEL = 'ALWAYS';
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET METRIC_LEVEL = 'ALL';
+--ALTER SCHEMA tasty_bytes_dbt_db_16.prod SET LOG_LEVEL = 'INFO';
+--ALTER SCHEMA tasty_bytes_dbt_db_16.prod SET TRACE_LEVEL = 'ALWAYS';
+--ALTER SCHEMA tasty_bytes_dbt_db_16.prod SET METRIC_LEVEL = 'ALL';
 
 -- =============================================================================
 -- STEP 4: Create a GitHub secret and API integration
@@ -78,22 +78,22 @@ ALTER SCHEMA tasty_bytes_dbt_db.prod SET METRIC_LEVEL = 'ALL';
 -- See: https://docs.snowflake.com/en/user-guide/ui-snowsight/workspaces-git
 -- =============================================================================
 
-USE tasty_bytes_dbt_db.integrations;
-CREATE OR REPLACE SECRET tasty_bytes_dbt_db.integrations.tb_dbt_git_secret
-  TYPE = password
-  USERNAME = 'your-gh-username'
-  PASSWORD = 'YOUR_PERSONAL_ACCESS_TOKEN';
+--USE tasty_bytes_dbt_db.integrations;
+--CREATE OR REPLACE SECRET tasty_bytes_dbt_db.integrations.tb_dbt_git_secret
+--  TYPE = password
+--  USERNAME = 'your-gh-username'
+--  PASSWORD = 'YOUR_PERSONAL_ACCESS_TOKEN';
 
 -- Replace 'https://github.com/my-github-account' with the URL of the GitHub
 -- account for your forked repository.
 -- This API integration is used when creating a workspace in Snowsight (Projects > Workspaces)
 -- to connect Snowflake to your forked GitHub repository.
-CREATE OR REPLACE API INTEGRATION tb_dbt_git_api_integration
-  API_PROVIDER = git_https_api
-  API_ALLOWED_PREFIXES = ('https://github.com/my-github-account')
+--CREATE OR REPLACE API INTEGRATION tb_dbt_git_api_integration
+--  API_PROVIDER = git_https_api
+--  API_ALLOWED_PREFIXES = ('https://github.com/my-github-account')
   -- Comment out the following line if your forked repository is public
-  ALLOWED_AUTHENTICATION_SECRETS = (tasty_bytes_dbt_db.integrations.tb_dbt_git_secret)
-  ENABLED = TRUE;
+--  ALLOWED_AUTHENTICATION_SECRETS = (tasty_bytes_dbt_db.integrations.tb_dbt_git_secret)
+--  ENABLED = TRUE;
 
 -- =============================================================================
 -- STEP 5: (Optional) Create a network rule and external access integration
@@ -129,20 +129,20 @@ CREATE OR REPLACE API INTEGRATION tb_dbt_git_api_integration
 
 -- File format and external stage
 
-CREATE OR REPLACE FILE FORMAT tasty_bytes_dbt_db.public.csv_ff 
+CREATE OR REPLACE FILE FORMAT tasty_bytes_dbt_db_16.public.csv_ff 
 type = 'csv';
 
-CREATE OR REPLACE STAGE tasty_bytes_dbt_db.public.s3load
+CREATE OR REPLACE STAGE tasty_bytes_dbt_db_16.public.s3load
 COMMENT = 'Quickstarts S3 Stage Connection'
 url = 's3://sfquickstarts/frostbyte_tastybytes/'
-file_format = tasty_bytes_dbt_db.public.csv_ff;
+file_format = tasty_bytes_dbt_db_16.public.csv_ff;
 
 -- =============================================================================
 --  Raw zone table builds
 -- =============================================================================
 
 -- country table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.country
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.country
 (
     country_id NUMBER(18,0),
     country VARCHAR(16777216),
@@ -155,7 +155,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.country
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- franchise table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.franchise 
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.franchise 
 (
     franchise_id NUMBER(38,0),
     first_name VARCHAR(16777216),
@@ -168,7 +168,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.franchise
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- location table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.location
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.location
 (
     location_id NUMBER(19,0),
     placekey VARCHAR(16777216),
@@ -181,7 +181,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.location
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- menu table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.menu
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.menu
 (
     menu_id NUMBER(19,0),
     menu_type_id NUMBER(38,0),
@@ -198,7 +198,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.menu
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- truck table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.truck
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.truck
 (
     truck_id NUMBER(38,0),
     menu_type_id NUMBER(38,0),
@@ -218,7 +218,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.truck
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- order_header table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_header
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.order_header
 (
     order_id NUMBER(38,0),
     truck_id NUMBER(38,0),
@@ -240,7 +240,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_header
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- order_detail table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_detail 
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.order_detail 
 (
     order_detail_id NUMBER(38,0),
     order_id NUMBER(38,0),
@@ -255,7 +255,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_detail
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- customer_loyalty table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.customer_loyalty
+CREATE OR REPLACE TABLE tasty_bytes_dbt_db_16.raw.customer_loyalty
 (
     customer_id NUMBER(38,0),
     first_name VARCHAR(16777216),
@@ -280,46 +280,46 @@ COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1
 -- =============================================================================
 
 -- country table load
-COPY INTO tasty_bytes_dbt_db.raw.country
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/country/;
+COPY INTO tasty_bytes_dbt_db_16.raw.country
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_pos/country/;
 
 -- franchise table load
-COPY INTO tasty_bytes_dbt_db.raw.franchise
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/franchise/;
+COPY INTO tasty_bytes_dbt_db_16.raw.franchise
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_pos/franchise/;
 
 -- location table load
-COPY INTO tasty_bytes_dbt_db.raw.location
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/location/;
+COPY INTO tasty_bytes_dbt_db_16.raw.location
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_pos/location/;
 
 -- menu table load
-COPY INTO tasty_bytes_dbt_db.raw.menu
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/menu/;
+COPY INTO tasty_bytes_dbt_db_16.raw.menu
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_pos/menu/;
 
 -- truck table load
-COPY INTO tasty_bytes_dbt_db.raw.truck
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/truck/;
+COPY INTO tasty_bytes_dbt_db_16.raw.truck
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_pos/truck/;
 
 -- customer_loyalty table load
-COPY INTO tasty_bytes_dbt_db.raw.customer_loyalty
-FROM @tasty_bytes_dbt_db.public.s3load/raw_customer/customer_loyalty/;
+COPY INTO tasty_bytes_dbt_db_16.raw.customer_loyalty
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_customer/customer_loyalty/;
 
 -- order_header table load
-COPY INTO tasty_bytes_dbt_db.raw.order_header
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/order_header/;
+COPY INTO tasty_bytes_dbt_db_16.raw.order_header
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_pos/order_header/;
 
 -- order_detail table load
-COPY INTO tasty_bytes_dbt_db.raw.order_detail
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/order_detail/;
+COPY INTO tasty_bytes_dbt_db_16.raw.order_detail
+FROM @tasty_bytes_dbt_db_16.public.s3load/raw_pos/order_detail/;
 
 -- =============================================================================
 -- Resize the warehouse now that the source data is built
 -- SMALL is sufficient for compiling, running, and scheduling the dbt project.
 -- =============================================================================
 
-ALTER WAREHOUSE tasty_bytes_dbt_wh SET WAREHOUSE_SIZE = SMALL;
+--ALTER WAREHOUSE tasty_bytes_dbt_wh SET WAREHOUSE_SIZE = SMALL;
 
 -- =============================================================================
 -- Setup complete
 -- =============================================================================
 
-SELECT 'tasty_bytes_dbt_db setup is now complete' AS note;
+SELECT 'tasty_bytes_dbt_db_16 setup is now complete' AS note;
